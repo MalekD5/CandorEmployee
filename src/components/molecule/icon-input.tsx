@@ -30,8 +30,6 @@ export default function IconInput({
 }: IconInputProps) {
 	const [focused, setFocused] = useState(false);
 
-	const baseInputAttributes = { rounded, focusable: false };
-
 	const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
 		setFocused(true);
 		onFocus?.(e);
@@ -56,7 +54,8 @@ export default function IconInput({
 				onFocus={handleFocus}
 				onFocusCapture={handleFocus}
 				onBlur={handleBlur}
-				{...baseInputAttributes}
+				rounded
+				focusable={false}
 				{...props}
 				size="empty"
 			/>

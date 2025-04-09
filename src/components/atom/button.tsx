@@ -5,13 +5,13 @@ import { twMerge } from "tailwind-merge";
 import { type VariantProps, tv } from "tailwind-variants";
 
 const buttonVariants = tv({
-	base: "text-white hover:cursor-pointer",
+	base: "text-white hover:cursor-pointer disabled:cursor-not-allowed active:translate-y-1",
 	variants: {
 		color: {
-			default: "bg-accent",
-			destructive: "bg-destructive",
-			warning: "bg-warning",
-			success: "bg-success",
+			default: "bg-accent disabled:bg-blue-800",
+			destructive: "bg-destructive disabled:bg-red-800/90",
+			warning: "bg-warning disabled:bg-yellow-600/90",
+			success: "bg-success disabled:bg-green-900/90",
 		},
 		size: {
 			default: "px-4 py-2",

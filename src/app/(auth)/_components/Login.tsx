@@ -3,6 +3,7 @@
 import Button from "@/components/atom/button";
 import Input from "@/components/atom/input";
 import { signIn } from "@/lib/auth-client";
+import { useState } from "react";
 
 export default function Login() {
 	return (
@@ -20,6 +21,10 @@ export default function Login() {
 					const { data, error } = await signIn.email({
 						email,
 						password,
+						fetchOptions: {
+							onSuccess: () => {},
+							onError: () => {},
+						},
 					});
 					console.log(data, error);
 				}}

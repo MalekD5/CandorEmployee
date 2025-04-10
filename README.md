@@ -2,7 +2,7 @@
 
 Candor Employee is Employee Management Directory built with Next.js, Drizzle, Tailwind CSS, and Radix UI. This project is a full-stack application that allows users to create, view, edit, and delete employee records. It also includes a user authentication system using the [better-auth](https://github.com/Better-Auth/better-auth) library.
 
-[Image](.github/images/image.png)
+![Image](.github/images/image.png)
 
 ## Prerequisites
 

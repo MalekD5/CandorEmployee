@@ -8,6 +8,7 @@ import { useState } from "react";
 import Button from "../atom/button";
 import Card from "../atom/card";
 import Form from "../atom/form";
+import Separator from "../atom/separator";
 import Spinner from "../atom/spinner";
 import Typography from "../atom/typography";
 import IconInput from "../molecule/icon-input";
@@ -73,7 +74,7 @@ export default function SignUpTemplate({
 							{loading ? <Spinner className="size-6" /> : "Register"}
 						</Button>
 					</Form>
-					<hr className="border-zinc-400" />
+					<Separator />
 					<Typography center className="text-sm">
 						Already have an account?{" "}
 						<Link href="/sign-in" className="text-success underline">

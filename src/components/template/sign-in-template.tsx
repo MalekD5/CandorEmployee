@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Button from "../atom/button";
 import Card from "../atom/card";
 import Form from "../atom/form";
+import Separator from "../atom/separator";
 import Spinner from "../atom/spinner";
 import Typography from "../atom/typography";
 import IconInput from "../molecule/icon-input";
@@ -72,7 +73,7 @@ export default function SignInTemplate({ onSignIn }: SignInTemplateProps) {
 							{loading ? <Spinner className="size-6" /> : "Login"}
 						</Button>
 					</Form>
-					<hr className="border-zinc-400" />
+					<Separator />
 					<Typography>
 						Don't have an account?{" "}
 						<Link href="/sign-up" className="text-accent underline">

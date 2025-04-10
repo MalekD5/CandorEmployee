@@ -88,7 +88,7 @@ export default function Sidebar() {
 
 	return (
 		<>
-			<div className="fixed my-2 z-50 justify-center md:hidden flex flex-col w-full">
+			<div className="bg-white fixed pt-2 z-50 justify-center md:hidden flex flex-col w-full">
 				<Button
 					color="ghost"
 					size="icon"

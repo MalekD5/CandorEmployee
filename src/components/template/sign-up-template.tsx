@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Button from "../atom/button";
+import Card from "../atom/card";
 import Form from "../atom/form";
 import Spinner from "../atom/spinner";
 import Typography from "../atom/typography";
@@ -29,7 +30,7 @@ export default function SignUpTemplate({
 	return (
 		<div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-foreground">
 			<div className="w-full max-w-sm">
-				<div className="bg-white flex flex-col gap-4 border border-zinc-300 p-10 rounded-xl">
+				<Card>
 					<div className="flex flex-col gap-1">
 						<Typography center level={1} className="text-xl">
 							Register
@@ -79,7 +80,7 @@ export default function SignUpTemplate({
 							Sign in
 						</Link>
 					</Typography>
-				</div>
+				</Card>
 			</div>
 		</div>
 	);

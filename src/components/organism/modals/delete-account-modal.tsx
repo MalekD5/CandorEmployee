@@ -1,5 +1,6 @@
 "use client";
 
+import UnifiedInput from "@/components/atom/unified-input";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -10,18 +11,18 @@ import {
 	AlertDialogHeader,
 	AlertDialogTitle,
 } from "@/components/organism/alert-dialog";
+import { deleteUser } from "@/lib/auth-client";
+import { useState } from "react";
+import { toast } from "react-toastify";
 
 interface DeleteAccountModalProps {
 	open: boolean;
 	onClose: () => void;
-	onConfirm: () => void;
 }
 
-export function DeleteAccountModal({
-	open,
-	onClose,
-	onConfirm,
-}: DeleteAccountModalProps) {
+export function DeleteAccountModal({ open, onClose }: DeleteAccountModalProps) {
+	const [password, setPassword] = useState("");
+
 	return (
 		<AlertDialog open={open} onOpenChange={onClose}>
 			<AlertDialogContent>
@@ -32,10 +33,34 @@ export function DeleteAccountModal({
 						account and remove all of your data from our servers.
 					</AlertDialogDescription>
 				</AlertDialogHeader>
+
+				<div className="grid gap-4 py-4">
+					<UnifiedInput
+						label="Password"
+						id="password"
+						name="password"
+						type="password"
+						required
+						onChange={(e) => setPassword(e.target.value)}
+						value={password}
+					/>
+				</div>
+
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
 					<AlertDialogAction
-						onClick={onConfirm}
+						onClick={async () => {
+							try {
+								await deleteUser({
+									password,
+								});
+							} catch {
+								toast.error("Invalid password");
+							} finally {
+								setPassword("");
+								onClose();
+							}
+						}}
 						className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 					>
 						Delete Account

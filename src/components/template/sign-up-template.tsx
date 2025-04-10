@@ -12,6 +12,7 @@ import Separator from "../atom/separator";
 import Spinner from "../atom/spinner";
 import Typography from "../atom/typography";
 import UnifiedInput from "../atom/unified-input";
+import { ToastContainer } from "react-toastify";
 
 type SignUpTemplateProps = {
 	onSignUp: (
@@ -89,6 +90,7 @@ export default function SignUpTemplate({
 					</Typography>
 				</Card>
 			</div>
+			<ToastContainer />
 		</div>
 	);
 }

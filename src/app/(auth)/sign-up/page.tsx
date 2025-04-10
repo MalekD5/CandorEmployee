@@ -2,6 +2,7 @@
 
 import SignUpTemplate from "@/components/template/sign-up-template";
 import { signUp } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 export default function SignUpPage() {
 	return (
@@ -27,7 +28,9 @@ export default function SignUpPage() {
 						onSuccess: () => {
 							router.replace("/sign-in?registered=true");
 						},
-						onError: () => {},
+						onError: (error) => {
+							toast.error(error.error.message);
+						},
 						onResponse: () => {
 							setLoading(false);
 						},

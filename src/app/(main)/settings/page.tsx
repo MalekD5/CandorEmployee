@@ -13,6 +13,7 @@ import UpdateProfileForm from "./_components/update-profile";
 import { redirect } from "next/navigation";
 import UpdatePasswordForm from "./_components/update-password";
 import DeleteAccountCard from "./_components/delete-account";
+import { ToastContainer } from "react-toastify";
 
 export default async function SettingsPage() {
 	const session = await auth.api.getSession({
@@ -70,6 +71,7 @@ export default async function SettingsPage() {
 					</CardContent>
 				</Card>
 			</div>
+			<ToastContainer />
 		</div>
 	);
 }

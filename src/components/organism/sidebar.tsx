@@ -68,7 +68,7 @@ function SidebarContent({
 							signOut({
 								fetchOptions: {
 									onSuccess: () => {
-										router.replace("/");
+										router.replace("/sign-in");
 									},
 								},
 							});

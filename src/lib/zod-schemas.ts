@@ -2,11 +2,13 @@ import { z } from "zod";
 
 import validator from "validator";
 
+const name = z
+	.string()
+	.min(2, "Name must be at least 2 characters long")
+	.max(100, "Name must be less than 100 characters");
+
 export const createEmployeeSchema = z.object({
-	name: z
-		.string()
-		.min(2, "Name must be at least 2 characters long")
-		.max(100, "Name must be less than 100 characters"),
+	name,
 	position: z
 		.string()
 		.min(2, "Position must be at least 2 characters long")
@@ -56,4 +58,24 @@ export const updateEmployeeSchema = z.object({
 			message: "Start date cannot be in the future",
 		})
 		.optional(),
+});
+
+export const updatePasswordSchema = z
+	.object({
+		currentPassword: z
+			.string()
+			.min(2, "Password must be at least 2 characters long"),
+		newPassword: z
+			.string()
+			.min(2, "Password must be at least 2 characters long"),
+		confirmPassword: z
+			.string()
+			.min(2, "Password must be at least 2 characters long"),
+	})
+	.refine((val) => val.newPassword === val.confirmPassword, {
+		message: "Passwords do not match",
+	});
+
+export const updateProfileSchema = z.object({
+	name,
 });

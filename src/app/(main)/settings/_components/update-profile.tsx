@@ -3,7 +3,10 @@
 import Button from "@/components/atom/button";
 import { CardContent, CardFooter } from "@/components/atom/card";
 import UnifiedInput from "@/components/atom/unified-input";
+import { updateUser } from "@/lib/auth-client";
+import { updateProfileSchema } from "@/lib/zod-schemas";
 import { Save } from "lucide-react";
+import { toast } from "react-toastify";
 
 type UpdateProfileFormProps = {
 	email?: string;
@@ -14,10 +17,30 @@ export default function UpdateProfileForm({
 	email,
 	name,
 }: UpdateProfileFormProps) {
-	const handleUpdateProfile = (e: React.FormEvent) => {
+	const handleUpdateProfile = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// In a real app, this would call an API to update the profile
-		alert("Profile updated successfully!");
+		console.log("ok");
+
+		const formData = new FormData(e.currentTarget);
+
+		const parsedData = updateProfileSchema.safeParse({
+			name: formData.get("name") as string,
+			email: formData.get("email") as string,
+		});
+
+		if (!parsedData.success || !parsedData.data) {
+			toast.error(parsedData.error.message);
+			return;
+		}
+
+		try {
+			const x = await updateUser({
+				name: parsedData.data.name,
+			});
+			console.log("data", x.data);
+		} catch {
+			toast.error("Invalid name");
+		}
 	};
 
 	return (
@@ -28,6 +51,7 @@ export default function UpdateProfileForm({
 						id="name"
 						defaultValue={name}
 						label="Name"
+						name="name"
 						placeholder="Your name"
 					/>
 				</div>

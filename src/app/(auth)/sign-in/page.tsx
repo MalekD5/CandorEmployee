@@ -2,6 +2,7 @@
 
 import SignInTemplate from "@/components/template/sign-in-template";
 import { signIn } from "@/lib/auth-client";
+import { toast } from "react-toastify";
 
 export default function SignInPage() {
 	return (
@@ -23,7 +24,9 @@ export default function SignInPage() {
 						onSuccess: () => {
 							router.replace("/");
 						},
-						onError: () => {},
+						onError: () => {
+							toast.error("Invalid email or password");
+						},
 						onResponse: () => {
 							setLoading(false);
 						},

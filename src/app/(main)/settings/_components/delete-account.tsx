@@ -8,11 +8,6 @@ import { useState } from "react";
 export default function DeleteAccountCard() {
 	const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-	const handleDeleteAccount = () => {
-		// In a real app, this would call an API to delete the account
-		alert("Account deleted successfully!");
-		setDeleteModalOpen(false);
-	};
 	return (
 		<>
 			<Button
@@ -27,7 +22,6 @@ export default function DeleteAccountCard() {
 			<DeleteAccountModal
 				open={deleteModalOpen}
 				onClose={() => setDeleteModalOpen(false)}
-				onConfirm={handleDeleteAccount}
 			/>
 		</>
 	);

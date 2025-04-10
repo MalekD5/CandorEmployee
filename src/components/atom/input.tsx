@@ -1,10 +1,11 @@
 "use client";
 
+import React from "react";
 import { twMerge } from "tailwind-merge";
 import { type VariantProps, tv } from "tailwind-variants";
 
 export const inputVariants = tv({
-	base: "border-gray-300 px-4 py-2",
+	base: "px-4 py-2",
 	variants: {
 		size: {
 			empty: "p-0",
@@ -15,7 +16,7 @@ export const inputVariants = tv({
 			false: "rounded-md",
 		},
 		focusable: {
-			true: "focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50 shadow-md",
+			true: "border border-gray-300 focus:border-accent focus:ring focus:ring-accent focus:ring-opacity-50",
 			false: "focus:!border-none focus:outline-none focus:ring-0 shadow-none",
 		},
 	},
@@ -25,19 +26,29 @@ export const inputVariants = tv({
 	},
 });
 
-type InputProps = VariantProps<typeof inputVariants> &
+type InputProps = { label?: string } & VariantProps<typeof inputVariants> &
 	Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">;
 
-export default function Input({
-	className,
-	size,
-	focusable,
-	rounded,
-	...props
-}: InputProps) {
-	const constructedClassName = inputVariants({ size, rounded, focusable });
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+	(
+		{ className, label, name, size, focusable, rounded, ...props }: InputProps,
+		ref,
+	) => {
+		const constructedClassName = inputVariants({ size, rounded, focusable });
 
-	return (
-		<input className={twMerge(constructedClassName, className)} {...props} />
-	);
-}
+		return (
+			<div className="flex flex-col gap-2">
+				{label && <label htmlFor={name}>{label}</label>}
+				<input
+					ref={ref}
+					className={twMerge(constructedClassName, className)}
+					name={name}
+					id={name}
+					{...props}
+				/>
+			</div>
+		);
+	},
+);
+
+export default Input;

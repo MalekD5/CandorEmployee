@@ -1,11 +1,35 @@
-import Link from "next/link";
-import Login from "../_components/Login";
+"use client";
 
-export default function page() {
+import SignInTemplate from "@/components/template/sign-in-template";
+import { signIn } from "@/lib/auth-client";
+
+export default function SignInPage() {
 	return (
-		<div className="m-1">
-			<Login />
-			<Link href="/sign-up">No account? Signup</Link>
-		</div>
+		<SignInTemplate
+			onSignIn={async (e, setLoading, router) => {
+				e.preventDefault();
+				const formData = new FormData(e.currentTarget);
+				const { email, password } = Object.fromEntries(formData) as {
+					email: string;
+					password: string;
+				};
+
+				setLoading(true);
+
+				await signIn.email({
+					email,
+					password,
+					fetchOptions: {
+						onSuccess: () => {
+							router.replace("/");
+						},
+						onError: () => {},
+						onResponse: () => {
+							setLoading(false);
+						},
+					},
+				});
+			}}
+		/>
 	);
 }

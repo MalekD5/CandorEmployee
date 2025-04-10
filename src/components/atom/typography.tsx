@@ -15,11 +15,15 @@ const typographyVariants = tv({
 		bold: {
 			true: "font-bold",
 		},
+		center: {
+			true: "text-center",
+		},
 	},
 });
 
 type TypographyProps = {
 	className?: string;
+	center?: boolean;
 } & VariantProps<typeof typographyVariants> &
 	React.PropsWithChildren;
 
@@ -27,13 +31,14 @@ export default function Typography({
 	level,
 	bold,
 	className,
+	center,
 	children,
 }: TypographyProps) {
 	const Component = (level ? `h${level}` : "p") as React.ElementType;
 	return (
 		<Component
 			className={twMerge(
-				typographyVariants({ level: level || 6, bold }),
+				typographyVariants({ level: level || 6, bold, center }),
 				className,
 			)}
 		>

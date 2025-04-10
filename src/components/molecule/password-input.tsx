@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { EyeNoneIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+import { useRef, useState } from "react";
 import { type VariantProps, tv } from "tailwind-variants";
 import Input, { inputVariants } from "../atom/input";
 
@@ -16,13 +17,14 @@ const iconInputVariants = tv({
 });
 
 type IconInputProps = {
-	Icon: IconType;
 	label?: string;
-} & Omit<VariantProps<typeof iconInputVariants>, "focused" | "focusable"> &
+} & Omit<
+	VariantProps<typeof iconInputVariants>,
+	"focused" | "focusable" | "type"
+> &
 	Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">;
 
-export default function IconInput({
-	Icon,
+export default function PasswordInput({
 	size,
 	rounded,
 	label,
@@ -32,6 +34,8 @@ export default function IconInput({
 	...props
 }: IconInputProps) {
 	const [focused, setFocused] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
+	const ref = useRef<HTMLInputElement>(null);
 
 	const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
 		setFocused(true);
@@ -62,14 +66,29 @@ export default function IconInput({
 					rounded
 					focusable={false}
 					{...props}
+					type={showPassword ? "text" : "password"}
 					size="empty"
+					ref={ref}
 					name={name}
 				/>
-				{
-					<Icon
-						className={`self-center size-5 ${focused ? "text-accent" : "text-zinc-500"}`}
+				{showPassword ? (
+					<EyeOpenIcon
+						className={`self-center hover:cursor-pointer size-5 ${focused ? "text-accent" : "text-zinc-500"}`}
+						onClick={() => {
+							setShowPassword(false);
+							ref.current?.focus();
+						}}
 					/>
-				}
+				) : (
+					<EyeNoneIcon
+						className={`self-center hover:cursor-pointer size-5 ${focused ? "text-accent" : "text-zinc-500"}`}
+						onClick={(e) => {
+							e.stopPropagation();
+							setShowPassword(true);
+							ref.current?.focus();
+						}}
+					/>
+				)}
 			</div>
 		</div>
 	);

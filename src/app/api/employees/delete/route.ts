@@ -7,9 +7,10 @@ import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 
-// Zod schema to validate request body
 const schema = z.object({
-	id: z.number().int(),
+	id: z.string().refine((val) => !Number.isNaN(Number(val)), {
+		message: "Invalid ID format",
+	}),
 });
 
 export async function DELETE(req: Request) {
@@ -22,8 +23,10 @@ export async function DELETE(req: Request) {
 			return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 		}
 
-		const body = await req.json();
-		const parse = schema.safeParse(body);
+		const url = new URL(req.url);
+		const searchParams = url.searchParams;
+
+		const parse = schema.safeParse(Object.fromEntries(searchParams.entries()));
 
 		if (!parse.success) {
 			return NextResponse.json(
@@ -38,7 +41,7 @@ export async function DELETE(req: Request) {
 		const employees = await db
 			.select()
 			.from(employee)
-			.where(eq(employee.id, id));
+			.where(eq(employee.id, id as unknown as number));
 		const selectedEmployee = employees[0];
 
 		if (!selectedEmployee) {
@@ -54,12 +57,14 @@ export async function DELETE(req: Request) {
 		}
 
 		// Perform delete
-		const deletedEmployee = await db
-			.delete(employee)
-			.where(eq(employee.id, id))
-			.returning();
+		await db.delete(employee).where(eq(employee.id, id as unknown as number));
 
-		return NextResponse.json(deletedEmployee[0], { status: 200 });
+		return NextResponse.json(
+			{
+				...selectedEmployee,
+			},
+			{ status: 200 },
+		);
 	} catch (error) {
 		console.error("[DELETE_EMPLOYEE]", error);
 		return NextResponse.json(

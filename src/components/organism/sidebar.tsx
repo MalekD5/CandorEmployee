@@ -8,6 +8,7 @@ import Button from "../atom/button";
 import Separator from "../atom/separator";
 import Typography from "../atom/typography";
 import { Sheet, SheetContent } from "../molecule/sheet";
+import { signOut } from "@/lib/auth-client";
 
 const tabs = [
 	{ id: "employees", label: "Employees", icon: PersonIcon, ref: "/" },
@@ -37,7 +38,7 @@ function SidebarContent({
 				<Separator />
 			</div>
 
-			<nav className="flex flex-col gap-1">
+			<nav className="flex flex-col gap-1 h-full">
 				{tabs.map((tab) => {
 					const Icon = tab.icon;
 					return (
@@ -59,6 +60,23 @@ function SidebarContent({
 						</Button>
 					);
 				})}
+
+				<div className="mt-auto">
+					<Button
+						color="destructive"
+						onClick={() => {
+							signOut({
+								fetchOptions: {
+									onSuccess: () => {
+										router.replace("/");
+									},
+								},
+							});
+						}}
+					>
+						Logout
+					</Button>
+				</div>
 			</nav>
 		</div>
 	);
@@ -70,17 +88,22 @@ export default function Sidebar() {
 
 	return (
 		<>
-			<Button
-				color="outline"
-				size="icon"
-				className="fixed left-4 top-4 z-50 md:hidden flex justify-center items-center"
-				onClick={() => setIsMobileOpen(true)}
-			>
-				<HamburgerMenuIcon className="h-5 w-5" />
-				<span className="sr-only">Open menu</span>
-			</Button>
+			<div className="fixed my-2 z-50 justify-center md:hidden flex flex-col w-full">
+				<Button
+					color="ghost"
+					size="icon"
+					className="ml-4 flex items-center justify-center w-fit gap-4"
+					onClick={() => setIsMobileOpen(true)}
+				>
+					<HamburgerMenuIcon className="h-5 w-5" />
+					<span className="sr-only">Open menu</span>
+					<Typography level={4}>Candor Employee</Typography>
+				</Button>
+				<div className="w-full">
+					<Separator />
+				</div>
+			</div>
 
-			{/* Mobile sidebar */}
 			<Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
 				<SheetContent side="left" className="w-64 p-0">
 					<SidebarContent
@@ -91,13 +114,15 @@ export default function Sidebar() {
 				</SheetContent>
 			</Sheet>
 
-			<div className="hidden w-64 shrink-0 border-r border-border bg-card md:block">
+			<div className="hidden fixed top-0 left-0 h-full w-64 shrink-0 border-r border-border bg-card md:block z-30 overflow-y-auto">
 				<SidebarContent
 					activeTab={activeTab}
 					setActiveTab={setActiveTab}
 					setIsMobileOpen={setIsMobileOpen}
 				/>
 			</div>
+
+			<div className="hidden md:block w-64 shrink-0" />
 		</>
 	);
 }

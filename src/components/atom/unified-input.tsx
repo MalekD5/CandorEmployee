@@ -11,7 +11,7 @@ import { type VariantProps, tv } from "tailwind-variants";
 
 // Tailwind-safe input styling
 const inputVariants = tv({
-	base: "w-full bg-transparent outline-none text-black",
+	base: "w-full bg-white outline-none text-black read-only:text-muted-foreground read-only:cursor-not-allowed",
 	variants: {
 		size: {
 			empty: "p-0",
@@ -29,7 +29,7 @@ const inputVariants = tv({
 
 // Wrapper (outer div) variants
 const wrapperVariants = tv({
-	base: "flex items-center border border-gray-300 gap-2 w-full transition-colors focus-within:outline-2",
+	base: "flex items-center border border-gray-300 gap-2 transition-colors focus-within:outline-2 bg-white cursor-text w-full",
 	variants: {
 		iconPosition: {
 			left: "flex-row",

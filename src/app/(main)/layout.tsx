@@ -18,7 +18,7 @@ export default async function Home({
 	return (
 		<div className=" flex min-h-screen flex-col bg-background text-foreground md:flex-row">
 			<Sidebar />
-			<main className="flex flex-1 flex-col">{children}</main>
+			<main className="flex flex-1 flex-col bg-foreground">{children}</main>
 		</div>
 	);
 }

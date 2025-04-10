@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db/drizzle";
 import { employee } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 
@@ -18,7 +18,8 @@ export async function GET() {
 		const employees = await db
 			.select()
 			.from(employee)
-			.where(eq(employee.userId, session.user.id));
+			.where(eq(employee.userId, session.user.id))
+			.orderBy(desc(employee.createdAt));
 
 		return NextResponse.json(employees, { status: 200 });
 	} catch (error) {

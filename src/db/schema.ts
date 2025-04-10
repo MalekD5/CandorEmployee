@@ -10,6 +10,8 @@ export const employee = pgTable("employee", {
 	phone: text("phone"),
 	startDate: timestamp("start_date"),
 
+	createdAt: timestamp("created_at").defaultNow(),
+
 	// Foreign key to the user (company)
 	userId: text("user_id")
 		.notNull()

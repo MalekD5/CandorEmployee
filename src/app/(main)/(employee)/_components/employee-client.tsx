@@ -8,9 +8,9 @@ import { ConfirmDeleteModal } from "@/components/organism/modals/delete-employee
 import { EditEmployeeModal } from "@/components/organism/modals/edit-employee-modal";
 import { ViewEmployeeModal } from "@/components/organism/modals/view-employee-modal";
 import EmployeeSkeleton from "@/components/organism/skeleton-employee";
-import { useOptimistic } from "@/hooks/useOptimistic";
-import { useEffect, useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { startTransition, useState } from "react";
+import { ToastContainer } from "react-toastify";
 
 export default function EmployeeClient() {
 	const [viewEmployee, setViewEmployee] = useState<Employee | null>(null);
@@ -18,40 +18,19 @@ export default function EmployeeClient() {
 	const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 
+	const queryClient = useQueryClient();
 	const [search, setSearch] = useState("");
 
-	const [employees, setEmployees] = useState<Employee[]>([]);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		const fetchEmployees = async () => {
-			try {
-				const response = await fetch("/api/employees");
-				const data = await response.json();
-				setEmployees(data);
-			} catch {
-				toast.error("Error fetching employees");
-			} finally {
-				setLoading(false);
-			}
-		};
-
-		fetchEmployees();
-	}, []);
-
-	const [optimisticEmployees, dispatch] = useOptimistic<
-		Employee[],
-		{ employee: Employee; action: string }
-	>(employees, (state, { employee, action }) => {
-		switch (action) {
-			case "delete":
-				return [...state.filter(({ id }) => id !== employee.id)];
-			case "update":
-				return [...state.map((e) => (e.id === employee.id ? employee : e))];
-			default:
-				return [employee, ...state];
-		}
+	const query = useQuery({
+		queryKey: ["employees"],
+		queryFn: async () => {
+			const response = await fetch("/api/employees");
+			const data = await response.json();
+			return data as Employee[];
+		},
 	});
+
+	const employees = query.data ?? [];
 
 	return (
 		<>
@@ -72,9 +51,9 @@ export default function EmployeeClient() {
 			<div className="flex-1 overflow-auto">
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					<CreateEmployeeCard setCreateModalOpen={setCreateModalOpen} />
-					{loading && <EmployeeSkeleton />}
+					{query.isLoading && <EmployeeSkeleton />}
 					{search === ""
-						? optimisticEmployees.map((employee) =>
+						? employees.map((employee) =>
 								employee.id === -1 ? (
 									<EmployeeSkeleton key={employee.id} />
 								) : (
@@ -87,7 +66,7 @@ export default function EmployeeClient() {
 									/>
 								),
 							)
-						: optimisticEmployees
+						: employees
 								.filter(
 									(employee) =>
 										employee.name
@@ -129,8 +108,8 @@ export default function EmployeeClient() {
 					onClose={() => {
 						setTimeout(() => setEditEmployee(null), 400);
 					}}
-					onUpdateEmployee={(employee) => {
-						dispatch({ employee, action: "update" });
+					onUpdateEmployee={() => {
+						queryClient.invalidateQueries({ queryKey: ["employees"] });
 					}}
 				/>
 			)}
@@ -142,8 +121,7 @@ export default function EmployeeClient() {
 					open={!!deleteEmployee}
 					onClose={() => setDeleteEmployee(null)}
 					onConfirm={() => {
-						dispatch({ employee: deleteEmployee, action: "delete" });
-						setDeleteEmployee(null);
+						queryClient.invalidateQueries({ queryKey: ["employees"] });
 					}}
 					title="Delete Employee"
 					description={`Are you sure you want to delete ${deleteEmployee.name}? This action cannot be undone.`}
@@ -154,20 +132,8 @@ export default function EmployeeClient() {
 			<CreateEmployeeModal
 				open={createModalOpen}
 				onClose={() => setCreateModalOpen(false)}
-				onCreateEmployee={(employee) => {
-					dispatch({
-						employee: {
-							id: -1,
-							name: employee.name,
-							position: employee.position,
-							department: employee.department,
-							email: employee.email,
-							phone: employee.phone,
-							startDate: employee.startDate,
-						},
-						action: "create",
-					});
-					setCreateModalOpen(false);
+				onCreateEmployee={() => {
+					queryClient.invalidateQueries({ queryKey: ["employees"] });
 				}}
 			/>
 

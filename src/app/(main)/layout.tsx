@@ -2,6 +2,7 @@ import Sidebar from "@/components/organism/sidebar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import Providers from "./providers";
 
 export default async function Home({
 	children,
@@ -18,7 +19,9 @@ export default async function Home({
 	return (
 		<div className=" flex min-h-screen flex-col bg-background text-foreground md:flex-row">
 			<Sidebar />
-			<main className="flex flex-1 flex-col bg-foreground">{children}</main>
+			<main className="flex flex-1 flex-col bg-foreground">
+				<Providers>{children}</Providers>
+			</main>
 		</div>
 	);
 }

@@ -1,4 +1,3 @@
-
 {
   "name": "candor-task",
   "version": "0.1.0",
@@ -16,6 +15,7 @@
     "@radix-ui/react-icons": "^1.3.2",
     "@radix-ui/react-select": "^2.1.7",
     "@radix-ui/react-slot": "^1.2.0",
+    "@tanstack/react-query": "^5.72.2",
     "better-auth": "^1.2.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

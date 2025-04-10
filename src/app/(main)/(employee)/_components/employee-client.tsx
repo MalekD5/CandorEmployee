@@ -7,61 +7,30 @@ import { CreateEmployeeModal } from "@/components/organism/modals/create-employe
 import { ConfirmDeleteModal } from "@/components/organism/modals/delete-employee-modal";
 import { EditEmployeeModal } from "@/components/organism/modals/edit-employee-modal";
 import { ViewEmployeeModal } from "@/components/organism/modals/view-employee-modal";
-import { useState } from "react";
+import { useOptimistic, useState } from "react";
 
-export default function EmployeeClient() {
+export default function EmployeeClient({
+	employees,
+}: { employees: Employee[] }) {
 	const [viewEmployee, setViewEmployee] = useState<Employee | null>(null);
 	const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
 	const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
 
-	const [employees] = useState<Employee[]>([
-		{
-			id: 1,
-			name: "Alex Johnson",
-			position: "Senior Developer",
-			department: "Engineering",
-			email: "alex.j@company.com",
-			phone: "+1 (555) 123-4567",
-			startDate: "2020-03-15",
-		},
-		{
-			id: 2,
-			name: "Sarah Williams",
-			position: "Product Manager",
-			department: "Product",
-			email: "sarah.w@company.com",
-			phone: "+1 (555) 234-5678",
-			startDate: "2019-06-22",
-		},
-		{
-			id: 3,
-			name: "Michael Brown",
-			position: "UX Designer",
-			department: "Design",
-			email: "michael.b@company.com",
-			phone: "+1 (555) 345-6789",
-			startDate: "2021-01-10",
-		},
-		{
-			id: 4,
-			name: "Emily Davis",
-			position: "Marketing Specialist",
-			department: "Marketing",
-			email: "emily.d@company.com",
-			phone: "+1 (555) 456-7890",
-			startDate: "2022-04-05",
-		},
-		{
-			id: 5,
-			name: "David Wilson",
-			position: "HR Manager",
-			department: "Human Resources",
-			email: "david.w@company.com",
-			phone: "+1 (555) 567-8901",
-			startDate: "2018-11-30",
-		},
-	]);
+	const [optimisticEmployees, dispatch] = useOptimistic<
+		Employee[],
+		{ employee: Employee; action: string }
+	>(employees, (state, { employee, action }) => {
+		switch (action) {
+			case "delete":
+				return state.filter(({ id }) => id !== employee.id);
+			case "update":
+				return state.map((e) => (e.id === employee.id ? employee : e));
+			default:
+				return [...state, employee];
+		}
+	});
+
 	return (
 		<>
 			<div className="flex items-center mb-6 gap-0.5 md:gap-2 mt-12 md:mt-0">
@@ -81,7 +50,7 @@ export default function EmployeeClient() {
 			<div className="flex-1 overflow-auto">
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					<CreateEmployeeCard setCreateModalOpen={setCreateModalOpen} />
-					{employees.map((employee) => (
+					{optimisticEmployees.map((employee) => (
 						<Employee
 							key={employee.id}
 							employee={employee}
@@ -106,7 +75,10 @@ export default function EmployeeClient() {
 				<EditEmployeeModal
 					employee={editEmployee}
 					open={!!editEmployee}
-					onClose={() => setEditEmployee(null)}
+					onClose={() => {
+						dispatch({ employee: editEmployee, action: "update" });
+						setEditEmployee(null);
+					}}
 				/>
 			)}
 
@@ -116,7 +88,7 @@ export default function EmployeeClient() {
 					open={!!deleteEmployee}
 					onClose={() => setDeleteEmployee(null)}
 					onConfirm={() => {
-						console.log(deleteEmployee);
+						dispatch({ employee: deleteEmployee, action: "delete" });
 						setDeleteEmployee(null);
 					}}
 					title="Delete Employee"
@@ -129,7 +101,18 @@ export default function EmployeeClient() {
 				open={createModalOpen}
 				onClose={() => setCreateModalOpen(false)}
 				onCreateEmployee={(employee) => {
-					console.log(employee);
+					dispatch({
+						employee: {
+							id: 1,
+							name: employee.name,
+							position: employee.position,
+							department: employee.department,
+							email: employee.email,
+							phone: employee.phone,
+							startDate: employee.startDate,
+						},
+						action: "create",
+					});
 					setCreateModalOpen(false);
 				}}
 			/>

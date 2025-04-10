@@ -24,7 +24,7 @@ import {
 interface CreateEmployeeModalProps {
 	open: boolean;
 	onClose: () => void;
-	onCreateEmployee: (employee: NewEmployee) => void;
+	onCreateEmployee: (employee: Employee) => void;
 }
 
 export function CreateEmployeeModal({
@@ -52,7 +52,7 @@ export function CreateEmployeeModal({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		onCreateEmployee(formData);
+		onCreateEmployee({ id: 1, ...formData });
 		setFormData({
 			name: "",
 			position: "",

@@ -7,7 +7,6 @@ export const employee = pgTable("employee", {
 	position: text("position").notNull(),
 	department: text("department").notNull(),
 	email: text("email").notNull().unique(),
-	avatar: text("avatar"),
 	phone: text("phone"),
 	startDate: timestamp("start_date"),
 

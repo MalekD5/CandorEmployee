@@ -1,35 +1,11 @@
 import { NextResponse } from "next/server";
-import { z } from "zod";
-import validator from "validator";
 
 import { db } from "@/db/drizzle";
 import { employee } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-
-const schema = z.object({
-	id: z.number().int(),
-	name: z.string().min(2).max(100).optional(),
-	position: z.string().min(2).max(100).optional(),
-	department: z.string().min(1).max(100).optional(),
-	email: z.string().email().max(255).optional(),
-	phone: z
-		.string()
-		.refine((val) => validator.isMobilePhone(val, "any"), {
-			message: "Invalid phone number format",
-		})
-		.optional(),
-	startDate: z
-		.string()
-		.refine((val) => !Number.isNaN(Date.parse(val)), {
-			message: "Invalid date format",
-		})
-		.refine((val) => new Date(val) <= new Date(), {
-			message: "Start date cannot be in the future",
-		})
-		.optional(),
-});
+import { updateEmployeeSchema } from "@/lib/zod-schemas";
 
 export async function PUT(req: Request) {
 	try {
@@ -42,7 +18,7 @@ export async function PUT(req: Request) {
 		}
 
 		const body = await req.json();
-		const parse = schema.safeParse(body);
+		const parse = updateEmployeeSchema.safeParse(body);
 		if (!parse.success) {
 			return NextResponse.json(
 				{ error: parse.error.flatten() },
@@ -54,7 +30,10 @@ export async function PUT(req: Request) {
 			parse.data;
 
 		// Fetch and validate ownership
-		const result = await db.select().from(employee).where(eq(employee.id, id));
+		const result = await db
+			.select()
+			.from(employee)
+			.where(eq(employee.id, id as unknown as number));
 
 		const selectedEmployee = result[0];
 		if (!selectedEmployee) {
@@ -78,10 +57,9 @@ export async function PUT(req: Request) {
 				phone,
 				startDate: startDate ? new Date(startDate) : undefined,
 			})
-			.where(eq(employee.id, id))
-			.returning();
+			.where(eq(employee.id, id as unknown as number));
 
-		return NextResponse.json(updated[0], { status: 200 });
+		return NextResponse.json(selectedEmployee, { status: 200 });
 	} catch (error) {
 		console.error("[EDIT_EMPLOYEE]", error);
 		return NextResponse.json(

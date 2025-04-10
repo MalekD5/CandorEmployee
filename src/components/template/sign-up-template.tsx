@@ -11,8 +11,7 @@ import Form from "../atom/form";
 import Separator from "../atom/separator";
 import Spinner from "../atom/spinner";
 import Typography from "../atom/typography";
-import IconInput from "../molecule/icon-input";
-import PasswordInput from "../molecule/password-input";
+import UnifiedInput from "../atom/unified-input";
 
 type SignUpTemplateProps = {
 	onSignUp: (
@@ -44,26 +43,33 @@ export default function SignUpTemplate({
 						onSubmit={(e) => onSignIn(e, setLoading, router)}
 						className="flex flex-col gap-4"
 					>
-						<IconInput
-							Icon={PersonIcon}
+						<UnifiedInput
+							icon={PersonIcon}
 							name="name"
 							label="Name"
 							placeholder="Name"
 							required
+							focusOutlineColor="success"
+							iconFocusColor="success"
 						/>
-						<IconInput
-							Icon={EnvelopeClosedIcon}
+						<UnifiedInput
+							icon={EnvelopeClosedIcon}
 							name="email"
 							label="Email"
 							placeholder="email@example.com"
 							type="email"
+							focusOutlineColor="success"
+							iconFocusColor="success"
 							required
 						/>
-						<PasswordInput
+						<UnifiedInput
 							name="password"
 							label="Password"
 							placeholder="password"
+							focusOutlineColor="success"
+							iconFocusColor="success"
 							required
+							password
 						/>
 						<Button
 							color="success"

@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import Logout from "../../_components/Logout";
+import EmployeeClient from "./_components/employee-client";
 
 export default async function Home() {
 	const session = await auth.api.getSession({
@@ -12,9 +12,8 @@ export default async function Home() {
 	}
 
 	return (
-		<div className="container mx-auto flex flex-1 flex-col px-4 py-6">
-			<h1>Welcome {session.user.name}</h1>
-			<Logout />
+		<div className="container mx-auto flex flex-1 flex-col px-4 pt-4 pb-6">
+			<EmployeeClient />
 		</div>
 	);
 }

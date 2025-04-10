@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import Button from "../atom/button";
-import Card from "../atom/card";
+import { Card } from "../atom/card";
 import Form from "../atom/form";
 import Separator from "../atom/separator";
 import Spinner from "../atom/spinner";
@@ -37,7 +37,7 @@ export default function SignInTemplate({ onSignIn }: SignInTemplateProps) {
 		<div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-foreground">
 			<ToastContainer />
 			<div className="w-full max-w-sm">
-				<Card>
+				<Card className="p-10">
 					<div className="flex flex-col gap-1">
 						<Typography center level={1} className="text-xl">
 							Login
@@ -74,7 +74,7 @@ export default function SignInTemplate({ onSignIn }: SignInTemplateProps) {
 						</Button>
 					</Form>
 					<Separator />
-					<Typography>
+					<Typography center>
 						Don't have an account?{" "}
 						<Link href="/sign-up" className="text-accent underline">
 							Sign up

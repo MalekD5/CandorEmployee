@@ -2,9 +2,10 @@
 
 import Button from "@/components/atom/button";
 import { signOut } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Logout() {
+	const router = useRouter();
 	return (
 		<Button
 			color="destructive"
@@ -12,7 +13,7 @@ export default function Logout() {
 				signOut({
 					fetchOptions: {
 						onSuccess: () => {
-							redirect("/");
+							router.replace("/");
 						},
 					},
 				});

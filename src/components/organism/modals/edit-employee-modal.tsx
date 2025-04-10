@@ -20,14 +20,18 @@ import {
 	SelectValue,
 } from "@/components/organism/select";
 import { useState } from "react";
+import { updateEmployeeSchema } from "@/lib/zod-schemas";
+import { toast } from "react-toastify";
 
 interface EditEmployeeModalProps {
 	employee: Employee;
 	open: boolean;
 	onClose: () => void;
+	onUpdateEmployee: (employee: Employee) => void;
 }
 
 export function EditEmployeeModal({
+	onUpdateEmployee,
 	employee,
 	open,
 	onClose,
@@ -43,12 +47,39 @@ export function EditEmployeeModal({
 		setFormData((prev) => ({ ...prev, [name]: value }));
 	};
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		// In a real app, this would call an API to update the employee
-		console.log("Updated employee:", formData);
-		alert(`Employee ${formData.name} updated!`);
-		onClose();
+
+		const formData = new FormData(e.currentTarget);
+
+		const parsedData = updateEmployeeSchema.safeParse({
+			...Object.fromEntries(formData),
+			id: employee.id,
+		});
+
+		if (!parsedData.success || !parsedData.data) {
+			toast.error(parsedData.error.message);
+			return;
+		}
+
+		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		const data = parsedData.data!;
+
+		const result = await fetch("/api/employees/update", {
+			method: "PUT",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+
+		if (result?.status >= 400) {
+			toast.error(result.text());
+		} else {
+			onUpdateEmployee(data as unknown as Employee);
+			toast.success("Employee created successfully");
+			onClose();
+		}
 	};
 
 	return (
@@ -91,6 +122,7 @@ export function EditEmployeeModal({
 									handleSelectChange("department", value)
 								}
 								required
+								name="department"
 							>
 								<SelectTrigger className="col-span-3 w-full">
 									<SelectValue placeholder="Select department" />
@@ -134,9 +166,8 @@ export function EditEmployeeModal({
 							id="startDate"
 							name="startDate"
 							type="date"
-							value={formData.startDate || ""}
-							onChange={handleChange}
 							className="col-span-3"
+							defaultValue={(employee.startDate as string).split("T")[0]}
 						/>
 					</div>
 

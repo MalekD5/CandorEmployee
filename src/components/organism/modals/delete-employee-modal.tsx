@@ -12,6 +12,7 @@ import {
 } from "@/components/organism/alert-dialog";
 
 interface ConfirmDeleteModalProps {
+	id: number;
 	open: boolean;
 	onClose: () => void;
 	onConfirm: () => void;
@@ -20,6 +21,7 @@ interface ConfirmDeleteModalProps {
 }
 
 export function ConfirmDeleteModal({
+	id,
 	open,
 	onClose,
 	onConfirm,
@@ -36,7 +38,16 @@ export function ConfirmDeleteModal({
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
 					<AlertDialogAction
-						onClick={onConfirm}
+						onClick={async () => {
+							const result = await fetch(`/api/employees/delete?id=${id}`, {
+								method: "delete",
+								headers: {
+									"Content-Type": "application/json",
+								},
+							});
+
+							onConfirm();
+						}}
 						className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
 					>
 						Delete

@@ -12,9 +12,9 @@ type Employee = {
 	position: string;
 	department: string;
 	email: string;
-	avatar?: string;
-	phone?: string;
-	startDate?: string;
+	avatar?: string | null;
+	phone?: string | null;
+	startDate?: Date | string | null;
 };
 
 type NewEmployee = {

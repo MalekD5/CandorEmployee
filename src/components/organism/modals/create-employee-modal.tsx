@@ -2,7 +2,6 @@
 
 import type React from "react";
 
-import { useState } from "react";
 import {
 	Dialog,
 	DialogContent,
@@ -20,6 +19,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/organism/select";
+import { createEmployeeSchema } from "@/lib/zod-schemas";
+import { toast, ToastContainer } from "react-toastify";
 
 interface CreateEmployeeModalProps {
 	open: boolean;
@@ -32,36 +33,44 @@ export function CreateEmployeeModal({
 	onClose,
 	onCreateEmployee,
 }: CreateEmployeeModalProps) {
-	const [formData, setFormData] = useState<NewEmployee>({
-		name: "",
-		position: "",
-		department: "",
-		email: "",
-		phone: "",
-		startDate: "",
-	});
-
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		setFormData((prev) => ({ ...prev, [name]: value }));
-	};
-
-	const handleSelectChange = (name: string, value: string) => {
-		setFormData((prev) => ({ ...prev, [name]: value }));
-	};
-
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		onCreateEmployee({ id: 1, ...formData });
-		setFormData({
-			name: "",
-			position: "",
-			department: "",
-			email: "",
-			phone: "",
-			startDate: "",
+
+		const formData = new FormData(e.currentTarget);
+		console.log("form", formData);
+
+		const parsedData = createEmployeeSchema.safeParse(
+			Object.fromEntries(formData),
+		);
+		if (!parsedData.success || !parsedData.data) {
+			toast.error(parsedData.error.message);
+			return;
+		}
+
+		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		const data = parsedData.data!;
+
+		console.log("parsed", data);
+		console.log("parsed", JSON.stringify(data));
+
+		const result = await fetch("/api/employees/create", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
 		});
-		onClose();
+
+		const added = await result.json();
+
+		onCreateEmployee({ ...added });
+
+		if (result?.status >= 400) {
+			toast.error(result.text());
+		} else {
+			toast.success("Employee created successfully");
+			onClose();
+		}
 	};
 
 	return (
@@ -80,8 +89,6 @@ export function CreateEmployeeModal({
 							label="Name *"
 							id="name"
 							name="name"
-							value={formData.name}
-							onChange={handleChange}
 							className="col-span-3"
 							required
 						/>
@@ -90,21 +97,13 @@ export function CreateEmployeeModal({
 							label="Position *"
 							id="position"
 							name="position"
-							value={formData.position}
-							onChange={handleChange}
 							className="col-span-3"
 							required
 						/>
 
 						<div className="flex flex-col bg-white cursor-text gap-2 flex-nowrap">
 							<label htmlFor="department">Department *</label>
-							<Select
-								value={formData.department}
-								onValueChange={(value) =>
-									handleSelectChange("department", value)
-								}
-								required
-							>
+							<Select name="department" required>
 								<SelectTrigger className="col-span-3 w-full">
 									<SelectValue placeholder="Select department" />
 								</SelectTrigger>
@@ -127,8 +126,6 @@ export function CreateEmployeeModal({
 							id="email"
 							name="email"
 							type="email"
-							value={formData.email}
-							onChange={handleChange}
 							className="col-span-3"
 							required
 						/>
@@ -137,8 +134,6 @@ export function CreateEmployeeModal({
 							label="Phone"
 							id="phone"
 							name="phone"
-							value={formData.phone || ""}
-							onChange={handleChange}
 							className="col-span-3"
 						/>
 
@@ -147,8 +142,6 @@ export function CreateEmployeeModal({
 							id="startDate"
 							name="startDate"
 							type="date"
-							value={formData.startDate || ""}
-							onChange={handleChange}
 							className="col-span-3"
 						/>
 					</div>
@@ -161,6 +154,7 @@ export function CreateEmployeeModal({
 					</DialogFooter>
 				</form>
 			</DialogContent>
+			<ToastContainer />
 		</Dialog>
 	);
 }

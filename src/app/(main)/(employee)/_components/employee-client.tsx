@@ -7,15 +7,37 @@ import { CreateEmployeeModal } from "@/components/organism/modals/create-employe
 import { ConfirmDeleteModal } from "@/components/organism/modals/delete-employee-modal";
 import { EditEmployeeModal } from "@/components/organism/modals/edit-employee-modal";
 import { ViewEmployeeModal } from "@/components/organism/modals/view-employee-modal";
-import { useOptimistic, useState } from "react";
+import EmployeeSkeleton from "@/components/organism/skeleton-employee";
+import { useOptimistic } from "@/hooks/useOptimistic";
+import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
-export default function EmployeeClient({
-	employees,
-}: { employees: Employee[] }) {
+export default function EmployeeClient() {
 	const [viewEmployee, setViewEmployee] = useState<Employee | null>(null);
 	const [editEmployee, setEditEmployee] = useState<Employee | null>(null);
 	const [deleteEmployee, setDeleteEmployee] = useState<Employee | null>(null);
 	const [createModalOpen, setCreateModalOpen] = useState(false);
+
+	const [search, setSearch] = useState("");
+
+	const [employees, setEmployees] = useState<Employee[]>([]);
+	const [loading, setLoading] = useState(true);
+
+	useEffect(() => {
+		const fetchEmployees = async () => {
+			try {
+				const response = await fetch("/api/employees");
+				const data = await response.json();
+				setEmployees(data);
+			} catch {
+				toast.error("Error fetching employees");
+			} finally {
+				setLoading(false);
+			}
+		};
+
+		fetchEmployees();
+	}, []);
 
 	const [optimisticEmployees, dispatch] = useOptimistic<
 		Employee[],
@@ -23,11 +45,11 @@ export default function EmployeeClient({
 	>(employees, (state, { employee, action }) => {
 		switch (action) {
 			case "delete":
-				return state.filter(({ id }) => id !== employee.id);
+				return [...state.filter(({ id }) => id !== employee.id)];
 			case "update":
-				return state.map((e) => (e.id === employee.id ? employee : e));
+				return [...state.map((e) => (e.id === employee.id ? employee : e))];
 			default:
-				return [...state, employee];
+				return [employee, ...state];
 		}
 	});
 
@@ -40,7 +62,7 @@ export default function EmployeeClient({
 							className="p-2 text-lg"
 							search
 							placeholder="Enter Employee name or Department"
-							onSubmit={(value) => console.log(value)}
+							onChange={(value) => setSearch(value.target.value)}
 							iconPosition="left"
 						/>
 					</div>
@@ -50,15 +72,44 @@ export default function EmployeeClient({
 			<div className="flex-1 overflow-auto">
 				<div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					<CreateEmployeeCard setCreateModalOpen={setCreateModalOpen} />
-					{optimisticEmployees.map((employee) => (
-						<Employee
-							key={employee.id}
-							employee={employee}
-							setViewEmployee={setViewEmployee}
-							setEditEmployee={setEditEmployee}
-							setDeleteEmployee={setDeleteEmployee}
-						/>
-					))}
+					{loading && <EmployeeSkeleton />}
+					{search === ""
+						? optimisticEmployees.map((employee) =>
+								employee.id === -1 ? (
+									<EmployeeSkeleton key={employee.id} />
+								) : (
+									<Employee
+										key={employee.id}
+										employee={employee}
+										setViewEmployee={setViewEmployee}
+										setEditEmployee={setEditEmployee}
+										setDeleteEmployee={setDeleteEmployee}
+									/>
+								),
+							)
+						: optimisticEmployees
+								.filter(
+									(employee) =>
+										employee.name
+											.toLowerCase()
+											.includes(search.toLowerCase()) ||
+										employee.department
+											.toLowerCase()
+											.includes(search.toLowerCase()),
+								)
+								.map((employee) =>
+									employee.id === -1 ? (
+										<EmployeeSkeleton key={employee.id} />
+									) : (
+										<Employee
+											key={employee.id}
+											employee={employee}
+											setViewEmployee={setViewEmployee}
+											setEditEmployee={setEditEmployee}
+											setDeleteEmployee={setDeleteEmployee}
+										/>
+									),
+								)}
 				</div>
 			</div>
 
@@ -76,8 +127,10 @@ export default function EmployeeClient({
 					employee={editEmployee}
 					open={!!editEmployee}
 					onClose={() => {
-						dispatch({ employee: editEmployee, action: "update" });
-						setEditEmployee(null);
+						setTimeout(() => setEditEmployee(null), 400);
+					}}
+					onUpdateEmployee={(employee) => {
+						dispatch({ employee, action: "update" });
 					}}
 				/>
 			)}
@@ -85,6 +138,7 @@ export default function EmployeeClient({
 			{/* Delete Confirmation Modal */}
 			{deleteEmployee && (
 				<ConfirmDeleteModal
+					id={deleteEmployee.id}
 					open={!!deleteEmployee}
 					onClose={() => setDeleteEmployee(null)}
 					onConfirm={() => {
@@ -103,7 +157,7 @@ export default function EmployeeClient({
 				onCreateEmployee={(employee) => {
 					dispatch({
 						employee: {
-							id: 1,
+							id: -1,
 							name: employee.name,
 							position: employee.position,
 							department: employee.department,
@@ -116,6 +170,8 @@ export default function EmployeeClient({
 					setCreateModalOpen(false);
 				}}
 			/>
+
+			<ToastContainer />
 		</>
 	);
 }

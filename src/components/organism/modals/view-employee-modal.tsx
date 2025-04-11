@@ -47,7 +47,7 @@ export function ViewEmployeeModal({
 
 				<div className="flex flex-col items-center py-4">
 					<Avatar className="h-24 w-24 mb-4">
-						<AvatarImage src={employee.avatar} alt={employee.name} />
+						<AvatarImage src={employee.avatar as string} alt={employee.name} />
 						<AvatarFallback className="text-xl">
 							{employee.name
 								.split(" ")
@@ -75,7 +75,7 @@ export function ViewEmployeeModal({
 					</div>
 					<div className="grid grid-cols-[120px_1fr] items-center gap-4">
 						<span className="font-medium">Start Date:</span>
-						<span>{formatDate(employee.startDate)}</span>
+						<span>{formatDate(employee.startDate as string)}</span>
 					</div>
 				</div>
 

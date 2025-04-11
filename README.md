@@ -30,6 +30,12 @@ Then, install dependencies:
 npm install
 ```
 
+Now, generate and migrate database tables:
+```bash
+npx drizzle-kit generate
+npx drizzle-kit migrate
+```
+
 Then, run the development server:
 ```bash
 npm run dev
